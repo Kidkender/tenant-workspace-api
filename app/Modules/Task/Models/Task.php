@@ -3,7 +3,7 @@
 namespace App\Modules\Task\Models;
 
 use App\Modules\Tenant\Models\Tenant;
-use App\Modules\User\User;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;

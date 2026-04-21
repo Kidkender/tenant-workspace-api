@@ -3,7 +3,7 @@
 namespace App\Modules\Tenant\Models;
 
 use App\Modules\Access\Models\Role;
-use App\Modules\User\User;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Table;

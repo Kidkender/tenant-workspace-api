@@ -16,18 +16,18 @@ class ResolveTenant
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $tenantId = $request->header('X-Tenant-ID');
-        if (!$tenantId) {
-            return response()->json(["error" => "Tenant not provided"], 400);
-        }
+        // $tenantId = $request->header('X-Tenant-ID');
+        // if (!$tenantId) {
+        //     return response()->json(["error" => "Tenant not provided"], 400);
+        // }
 
-        $tenant = Tenant::find($tenantId);
+        // $tenant = Tenant::find($tenantId);
 
-        if (!$tenant) {
-            return response()->json(["error" => "Tenant not found"], 404);
-        }
+        // if (!$tenant) {
+        //     return response()->json(["error" => "Tenant not found"], 404);
+        // }
 
-        app()->instance('tenant', $tenant);
+        // app()->instance('tenant', $tenant);
         return $next($request);
     }
 }

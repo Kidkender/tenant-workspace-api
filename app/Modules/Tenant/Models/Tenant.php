@@ -4,7 +4,7 @@ namespace App\Modules\Tenant\Models;
 
 use App\Modules\Billing\Models\Plan;
 use App\Modules\Tenant\Models\TenantUser;
-use App\Modules\User\User;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
