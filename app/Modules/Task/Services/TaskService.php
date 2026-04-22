@@ -1,16 +1,17 @@
 <?php
+
 namespace App\Modules\Task\Services;
 
 use App\Modules\Task\Models\Task;
 use App\Modules\Tenant\Models\Tenant;
-use App\Modules\User\User;
+use App\Modules\User\Models\User;
 use Illuminate\Support\Str;
 
 class TaskService
 {
     public function createTask(array $data, User $user, Tenant $tenant): Task
     {
-        if (!$tenant->hasUser($user->id)) {
+        if (! $tenant->hasUser($user->id)) {
             throw new \Exception('User is not a member of this tenant');
         }
 

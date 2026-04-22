@@ -3,6 +3,7 @@
 namespace App\Modules\User\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Modules\Access\Models\Role;
 use App\Modules\Tenant\Models\Tenant;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -76,4 +78,11 @@ class User extends Authenticatable
             ->where('tenant_id', $tenantId)
             ->exists();
     }
+
+    public function isAdmin(string $tenantId): bool
+    {
+        $adminRoleId = Cache::rememberForever('role_id_admin', fn() => Role::where('name', 'admin')->value('id'));
+        return $this->tenants()->where('tenant_id', $tenantId)->wherePivot('role_id', $adminRoleId)->exists();
+    }
+
 }

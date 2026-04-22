@@ -26,7 +26,9 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable('key', 'description')]
 class Permission extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
+
+    public $timestamps = false;
 
     public function roles()
     {

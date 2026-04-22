@@ -28,13 +28,13 @@ class TaskController extends Controller
 
         $user = $request->user();
 
-        // $tenant = app('tenant');
-        $tenant = \App\Modules\Tenant\Models\Tenant::first();
+        $tenant = app('tenant');
 
         $task = $this->taskService->createTask($data, $user, $tenant);
+
         return response()->json([
             'message' => 'Task created successfully',
-            'task' => $task
+            'task' => $task,
         ], 201);
     }
 }

@@ -25,14 +25,16 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 #[Table('roles')]
-#[Fillable('name', 'description')]
+#[Fillable('name', 'description', 'tenant_id')]
 class Role extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class);
+        return $this->belongsToMany(Permission::class, 'role_permissions');
     }
 
     public function tenantUsers()
