@@ -15,28 +15,37 @@ class RBACSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            PermissionConstant::TASK_VIEW,
             PermissionConstant::TASK_CREATE,
             PermissionConstant::TASK_UPDATE,
+            PermissionConstant::TASK_DELETE,
+            PermissionConstant::COMMENT_CREATE,
+            PermissionConstant::COMMENT_DELETE,
+            PermissionConstant::COMMENT_DELETE_ANY,
         ];
 
         foreach ($permissions as $key) {
-            Permission::updateOrCreate(["key" => $key]);
+            Permission::updateOrCreate(['key' => $key]);
         }
 
-        $admin = Role::firstOrCreate(["name" => "admin"]);
-        $member = Role::firstOrCreate(["name" => "member"]);
+        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $member = Role::firstOrCreate(['name' => 'member']);
+        $owner = Role::firstOrCreate(['name' => 'owner']);
 
-        $admin->permissions()->sync(
-            Permission::pluck("id")
-        );
+        $allPermissions = Permission::pluck('id');
+
+        $admin->permissions()->sync($allPermissions);
+        $owner->permissions()->sync($allPermissions);
 
         $member->permissions()->sync(
             Permission::whereIn('key', [
+                PermissionConstant::TASK_VIEW,
                 PermissionConstant::TASK_CREATE,
                 PermissionConstant::TASK_UPDATE,
+                PermissionConstant::COMMENT_CREATE,
+                PermissionConstant::COMMENT_DELETE,
             ])->pluck('id')
         );
-
 
     }
 }

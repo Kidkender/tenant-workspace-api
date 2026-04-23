@@ -9,11 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
 {
-
     public function __construct(
         private PermissionService $permissionService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle an incoming request.
@@ -24,7 +22,7 @@ class CheckPermission
     {
         $user = $request->user();
         $tenant = app('tenant');
-        if (!$user || !$tenant) {
+        if (! $user || ! $tenant) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -32,12 +30,12 @@ class CheckPermission
 
         foreach ($permissionList as $permission) {
             if ($this->permissionService->hasPermission($user, $permission, $tenant->id)) {
-                return next($request);
+                return $next($request);
             }
         }
 
         return response()->json([
-            "message" => "Forbidden"
+            'message' => 'Forbidden',
         ], 403);
     }
 }
