@@ -4,11 +4,13 @@ namespace App\Modules\Task\Models;
 
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\User\Models\User;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -16,9 +18,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $tenant_id
  * @property string $user_id
  * @property string $content
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Modules\Task\Models\Task $task
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Task $task
  * @property-read User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskComment newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskComment newQuery()
@@ -38,7 +40,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable('task_id', 'tenant_id', 'user_id', 'content')]
 class TaskComment extends Model
 {
-    use HasFactory, HasUuids;
+    use BelongsToTenant, HasFactory, HasUuids;
 
     public function task()
     {
@@ -54,5 +56,4 @@ class TaskComment extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }

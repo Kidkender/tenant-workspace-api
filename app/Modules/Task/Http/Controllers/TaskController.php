@@ -5,23 +5,25 @@ namespace App\Modules\Task\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Requests\CreateTaskRequest;
+use App\Modules\Task\Requests\TaskFilterRequest;
 use App\Modules\Task\Requests\UpdateTaskRequest;
 use App\Modules\Task\Services\TaskService;
+use Request;
 
 class TaskController extends Controller
 {
-    public function __construct(private TaskService $taskService) {}
+    public function __construct(private TaskService $taskService)
+    {
+    }
 
-    public function index()
+    public function index(TaskFilterRequest $request)
     {
         $tenant = app('tenant');
         $this->authorize('viewAny', [Task::class, $tenant->id]);
 
-        $tasks = $this->taskService->getTasks($tenant->id);
+        $tasks = $this->taskService->getTasks($request);
 
-        return response()->json([
-            'tasks' => $tasks,
-        ], 200);
+        return $this->success($tasks);
     }
 
     public function show($id)
@@ -31,9 +33,7 @@ class TaskController extends Controller
 
         $this->authorize('view', $task);
 
-        return response()->json([
-            'task' => $task,
-        ], 200);
+        return $this->success($task);
     }
 
     public function store(CreateTaskRequest $request)
@@ -47,10 +47,7 @@ class TaskController extends Controller
 
         $task = $this->taskService->createTask($data, $user, $tenant);
 
-        return response()->json([
-            'message' => 'Task created successfully',
-            'task' => $task,
-        ], 201);
+        return $this->success($task, [], 'Task created successfully', 201);
     }
 
     public function update(UpdateTaskRequest $request, $id)
@@ -63,10 +60,7 @@ class TaskController extends Controller
 
         $newTask = $this->taskService->updateTask($task, $data);
 
-        return response()->json([
-            'message' => 'Task updated successfully',
-            'task' => $newTask,
-        ], 200);
+        return $this->success($newTask, [], 'Task updated successfully', 200);
     }
 
     public function destroy($id)
@@ -78,8 +72,22 @@ class TaskController extends Controller
 
         $this->taskService->deleteTask($task);
 
-        return response()->json([
-            'message' => 'Task deleted successfully',
-        ], 200);
+        return $this->success(null, [], 'Task deleted successfully', 200);
+    }
+
+    public function assign(Request $request, $id)
+    {
+        $task = Task::findOrFail($id);
+        $this->authorize('update', $task);
+
+        return $this->success(
+            $this->taskService->assign(
+                $task,
+                $request->input('user_id')
+            ),
+            [],
+            'Task assigned successfully',
+            200
+        );
     }
 }

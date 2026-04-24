@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereName($value)
+ * @property string|null $tenant_id
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereTenantId($value)
  * @mixin \Eloquent
  */
 #[Table('roles')]

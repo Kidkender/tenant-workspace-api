@@ -7,7 +7,9 @@ use App\Modules\Tenant\Requests\StoreTenantRequest;
 
 class TenantController extends Controller
 {
-    public function __construct(private TenantService $tenantService) {}
+    public function __construct(private TenantService $tenantService)
+    {
+    }
 
     public function store(StoreTenantRequest $request)
     {
@@ -18,9 +20,6 @@ class TenantController extends Controller
             $user
         );
 
-        return response()->json([
-            'message' => 'Tenant created',
-            'data' => $tenant,
-        ]);
+        return $this->success($tenant, [], 'Tenant created', 201);
     }
 }

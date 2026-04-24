@@ -14,7 +14,8 @@ class TaskCommentController extends Controller
     public function __construct(
         private TaskService $taskService,
         private TaskCommentService $commentService
-    ) {}
+    ) {
+    }
 
     public function index(string $taskId)
     {
@@ -23,7 +24,7 @@ class TaskCommentController extends Controller
 
         $comments = $this->commentService->getComments($task);
 
-        return response()->json(['comments' => $comments], 200);
+        return $this->success($comments, [], 'Comments retrieved successfully', 200);
     }
 
     public function store(CreateCommentRequest $request, string $taskId)
@@ -35,10 +36,7 @@ class TaskCommentController extends Controller
 
         $comment = $this->commentService->createComment($task, $request->user(), $request->validated());
 
-        return response()->json([
-            'message' => 'Comment created successfully',
-            'comment' => $comment,
-        ], 201);
+        return $this->success($comment, [], 'Comment created successfully', 201);
     }
 
     public function update(UpdateCommentRequest $request, string $taskId, string $commentId)
@@ -51,10 +49,7 @@ class TaskCommentController extends Controller
 
         $updated = $this->commentService->updateComment($comment, $request->validated());
 
-        return response()->json([
-            'message' => 'Comment updated successfully',
-            'comment' => $updated,
-        ], 200);
+        return $this->success($updated, [], 'Comment updated successfully', 200);
     }
 
     public function destroy(string $taskId, string $commentId)
@@ -67,6 +62,6 @@ class TaskCommentController extends Controller
 
         $this->commentService->deleteComment($comment);
 
-        return response()->json(['message' => 'Comment deleted successfully'], 200);
+        return $this->success(null, [], 'Comment deleted successfully', 200);
     }
 }
