@@ -39,6 +39,10 @@ use Illuminate\Database\Eloquent\Model;
 class ActivityLog extends Model
 {
 
+    protected $casts = [
+        'metadata' => 'array',
+    ];
+
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);

@@ -21,12 +21,13 @@ class ActivityLogService
     public function getLogs($filters)
     {
         return ActivityLog::query()
+            ->with('user:id,name,email')
             ->where('tenant_id', app('tenant')->id)
-            ->where('entity_type', $filters['entity_type'])
-            ->where('entity_id', $filters['entity_id'])
-            ->where('action', $filters['action'])
+            ->when(! empty($filters['entity_type']), fn ($q) => $q->where('entity_type', $filters['entity_type']))
+            ->when(! empty($filters['entity_id']), fn ($q) => $q->where('entity_id', $filters['entity_id']))
+            ->when(! empty($filters['user_id']), fn ($q) => $q->where('user_id', $filters['user_id']))
+            ->when(! empty($filters['action']), fn ($q) => $q->where('action', $filters['action']))
             ->latest()
-            ->limit($filters['limit'])
-            ->paginate();
+            ->paginate($filters['limit'] ?? 20);
     }
 }

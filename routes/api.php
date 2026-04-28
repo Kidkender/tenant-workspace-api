@@ -2,18 +2,28 @@
 
 use App\Constants\Permission;
 use App\Http\Middleware\ResolveTenant;
+use App\Modules\Activity\ActivityLogController;
 use App\Modules\Auth\AuthController;
+use App\Modules\Dashboard\DashboardController;
 use App\Modules\Task\Http\Controllers\TaskCommentController;
 use App\Modules\Task\Http\Controllers\TaskController;
 use App\Modules\Tenant\TenantController;
+use App\Modules\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
-
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tenants', [TenantController::class, 'store']);
+    Route::get('/me', [UserController::class, 'getMe']);
+    Route::put('/me', [UserController::class, 'updateMe']);
+});
+
+Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
+    Route::get('/tenant/members', [TenantController::class, 'members']);
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 
     Route::prefix('/tasks')->group(function () {
         Route::get('/', [TaskController::class, 'index'])

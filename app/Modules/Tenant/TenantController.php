@@ -3,13 +3,13 @@
 namespace App\Modules\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\Tenant\Requests\StoreTenantRequest;
+use Illuminate\Http\Request;
 
 class TenantController extends Controller
 {
-    public function __construct(private TenantService $tenantService)
-    {
-    }
+    public function __construct(private TenantService $tenantService) {}
 
     public function store(StoreTenantRequest $request)
     {
@@ -21,5 +21,22 @@ class TenantController extends Controller
         );
 
         return $this->success($tenant, [], 'Tenant created', 201);
+    }
+
+    public function members(Request $request)
+    {
+        $tenantId = $request->header('X-Tenant-ID');
+
+        $members = TenantUser::with('user:id,name,email')
+            ->where('tenant_id', $tenantId)
+            ->where('status', 'active')
+            ->get()
+            ->map(fn (TenantUser $tu) => [
+                'id' => $tu->user->id,
+                'name' => $tu->user->name,
+                'email' => $tu->user->email,
+            ]);
+
+        return $this->success($members, [], 'Members retrieved');
     }
 }

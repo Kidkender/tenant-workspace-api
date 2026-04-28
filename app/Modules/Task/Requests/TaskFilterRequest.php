@@ -23,9 +23,10 @@ class TaskFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'nullable|in:todo,doing,done',
+            'status' => 'nullable|in:todo,doing,completed',
             'assigned_to' => 'nullable|string',
             'created_by' => 'nullable|string',
+            'search' => 'nullable|string|max:100',
             'limit' => 'nullable|integer|min:1|max:100',
         ];
     }
