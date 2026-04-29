@@ -4,6 +4,7 @@ namespace App\Modules\Tenant;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Tenant\Models\TenantUser;
+use App\Modules\Tenant\Requests\InvitationRequest;
 use App\Modules\Tenant\Requests\StoreTenantRequest;
 use Illuminate\Http\Request;
 
@@ -38,5 +39,14 @@ class TenantController extends Controller
             ]);
 
         return $this->success($members, [], 'Members retrieved');
+    }
+
+    public function invite(InvitationRequest $request)
+    {
+        $tenant = app('tenant');
+        $data = $request->validated();
+        $this->tenantService->invite($tenant, $data['email'], $data['role_id']);
+
+        return $this->success();
     }
 }

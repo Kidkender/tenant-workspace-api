@@ -6,13 +6,12 @@ use App\Modules\Activity\ActivityLogService;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Models\TaskComment;
 use App\Modules\User\Models\User;
+use App\Notifications\TaskCommented;
 use Illuminate\Database\Eloquent\Collection;
 
 class TaskCommentService
 {
-    public function __construct(private ActivityLogService $activityLogService)
-    {
-    }
+    public function __construct(private ActivityLogService $activityLogService) {}
 
     public function getComments(Task $task): Collection
     {
@@ -33,6 +32,15 @@ class TaskCommentService
         ]);
 
         $this->activityLogService->logActivity('create', 'task_comment', $comment->id, $data);
+
+        $recipients = User::whereIn('id', array_filter([
+            $task->created_by,
+            $task->assigned_to,
+        ]))
+            ->where('id', '!=', $user->id)
+            ->get();
+
+        $recipients->each->notify(new TaskCommented($task, $comment));
 
         return $comment;
     }

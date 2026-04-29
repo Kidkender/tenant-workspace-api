@@ -7,6 +7,9 @@ use App\Modules\Task\Models\Task;
 use App\Modules\Task\Requests\TaskFilterRequest;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\User\Models\User;
+use App\Notifications\TaskAssigned;
+use App\Notifications\TaskStatusChanged;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TaskService
@@ -54,23 +57,44 @@ class TaskService
 
         $this->activityLogService->logActivity('create', 'task', $task->id, $data);
 
+        if (isset($data['assigned_to'])) {
+            $assignee = User::find($data['assigned_to']);
+            $assignee?->notify(new TaskAssigned($task));
+        }
+
         return $task;
     }
 
     public function updateTask(Task $task, array $data): Task
     {
+        $oldStatus = $task->status;
+
         $task->update($data);
 
         $this->activityLogService->logActivity('update', 'task', $task->id, $data);
 
+        if (isset($data['status']) && $data['status'] !== $oldStatus) {
+            $creator = User::find($task->created_by);
+            $creator?->notify(new TaskStatusChanged($task, $oldStatus, $data['status']));
+        }
+
         return $task;
     }
 
-    public function assign(Task $task, string $userId): Task
+    public function assign(Task $task, Tenant $tenant, string $userId): Task
     {
+        $user = User::findOrFail($userId);
+
+        if (! $tenant->hasUser($user->id)) {
+            throw new AuthorizationException('User is not a member of this tenant');
+        }
+
         $task->update(['assigned_to' => $userId]);
+        $task->refresh();
 
         $this->activityLogService->logActivity('assign', 'task', $task->id, ['assigned_to' => $userId]);
+
+        $user->notify(new TaskAssigned($task));
 
         return $task;
     }

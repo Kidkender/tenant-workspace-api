@@ -8,13 +8,11 @@ use App\Modules\Task\Requests\CreateTaskRequest;
 use App\Modules\Task\Requests\TaskFilterRequest;
 use App\Modules\Task\Requests\UpdateTaskRequest;
 use App\Modules\Task\Services\TaskService;
-use Request;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function __construct(private TaskService $taskService)
-    {
-    }
+    public function __construct(private TaskService $taskService) {}
 
     public function index(TaskFilterRequest $request)
     {
@@ -77,14 +75,15 @@ class TaskController extends Controller
 
     public function assign(Request $request, $id)
     {
-        $task = Task::findOrFail($id);
+        $request->validate(['user_id' => 'required|uuid|exists:users,id']);
+
+        $tenant = app('tenant');
+        $task = $this->taskService->getTask($tenant->id, $id);
+
         $this->authorize('update', $task);
 
         return $this->success(
-            $this->taskService->assign(
-                $task,
-                $request->input('user_id')
-            ),
+            $this->taskService->assign($task, $tenant, $request->input('user_id')),
             [],
             'Task assigned successfully',
             200
