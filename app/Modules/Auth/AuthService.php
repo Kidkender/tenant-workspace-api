@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth;
 
+use App\Constants\ErrorCode;
 use App\Modules\User\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
@@ -30,11 +31,11 @@ class AuthService
         $user = User::where('email', $data['email'])->first();
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
-            throw new \Exception('invalid_credentials');
+            throw new \Exception(ErrorCode::AUTH_INVALID_CREDENTIALS);
         }
 
         if (! $user->hasVerifiedEmail()) {
-            throw new \Exception('email_not_verified');
+            throw new \Exception(ErrorCode::AUTH_EMAIL_NOT_VERIFIED);
         }
 
         return $user->createToken('api-token')->plainTextToken;

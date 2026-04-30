@@ -2,6 +2,7 @@
 
 namespace App\Modules\Task\Services;
 
+use App\Constants\ErrorCode;
 use App\Modules\Activity\ActivityLogService;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Requests\TaskFilterRequest;
@@ -42,7 +43,7 @@ class TaskService
     public function createTask(array $data, User $user, Tenant $tenant): Task
     {
         if (! $tenant->hasUser($user->id)) {
-            throw new \Exception('User is not a member of this tenant');
+            throw new \Exception(ErrorCode::TENANT_NOT_MEMBER);
         }
 
         $task = Task::create([

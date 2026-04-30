@@ -4,9 +4,9 @@ namespace App\Modules\Tenant;
 
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\Tenant\Models\TenantInvitation;
-use App\Modules\Tenant\Models\TenantInvitations;
 use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\User\Models\User;
+use App\Notifications\TenantInvite;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -67,7 +67,7 @@ class TenantService
             ]
         );
 
-        Notification::route('mail', $email)->notify(new TenantInvitation($invitation));
+        Notification::route('mail', $email)->notify(new TenantInvite($invitation));
 
         return $invitation;
     }

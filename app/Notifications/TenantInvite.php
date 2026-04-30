@@ -2,12 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Modules\Tenant\Models\TenantInvitation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TenantInvitation extends Notification
+class TenantInvite extends Notification
 {
     use Queueable;
 

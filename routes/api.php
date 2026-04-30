@@ -17,16 +17,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+    $user = User::findOrFail($id);
+    if (!hash_equals(sha1($user->email), $hash)) {
+        abort(403, 'Invalid verification hash.');
+    }
+
+    if (!$user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
 
     return redirect(env('FRONTEND_URL') . '/email-verified');
-})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+})->middleware(['signed'])->name('verification.verify');
 
 Route::post('/email/verify/resend', [AuthController::class, 'resendEmailVerification']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tenants', [TenantController::class, 'store']);
+    Route::post('/tenants/accept/{token}', [TenantController::class, 'accept']);
     Route::get('/me', [UserController::class, 'getMe']);
     Route::put('/me', [UserController::class, 'updateMe']);
 });

@@ -2,12 +2,13 @@
 
 namespace App\Modules\Auth;
 
+use App\Constants\ErrorCode;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Requests\RegisterRequest;
 use App\Modules\User\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -29,17 +30,15 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $data = $request->validated();
-
         try {
             $token = $this->authService->login($data);
-
             return response()->json(['token' => $token], 200);
         } catch (\Exception $e) {
-            if ($e->getMessage() === 'email_not_verified') {
-                return response()->json(['error' => 'email_not_verified'], 403);
+            if ($e->getMessage() === ErrorCode::AUTH_EMAIL_NOT_VERIFIED) {
+                return response()->json(['error' => ErrorCode::AUTH_EMAIL_NOT_VERIFIED], 403);
             }
 
-            return response()->json(['error' => 'invalid_credentials'], 401);
+            return response()->json(['error' => ErrorCode::AUTH_INVALID_CREDENTIALS], 401);
         }
     }
 

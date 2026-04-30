@@ -49,4 +49,11 @@ class TenantController extends Controller
 
         return $this->success();
     }
+
+    public function accept(Request $request, string $token)
+    {
+        $this->tenantService->accept($token, $request->user());
+
+        return $this->success();
+    }
 }

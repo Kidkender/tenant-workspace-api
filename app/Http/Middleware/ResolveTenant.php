@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Constants\ErrorCode;
 use App\Modules\Tenant\Models\Tenant;
 use Closure;
 use Illuminate\Http\Request;
@@ -18,13 +19,13 @@ class ResolveTenant
     {
         $tenantId = $request->header('X-Tenant-ID');
         if (! $tenantId) {
-            return response()->json(['error' => 'Tenant not provided'], 400);
+            return response()->json(['error' => ErrorCode::TENANT_NOT_PROVIDED], 400);
         }
 
         $tenant = Tenant::find($tenantId);
 
         if (! $tenant) {
-            return response()->json(['error' => 'Tenant not found'], 404);
+            return response()->json(['error' => ErrorCode::TENANT_NOT_FOUND], 404);
         }
 
         app()->instance('tenant', $tenant);

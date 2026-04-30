@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Constants\ErrorCode;
 use App\Modules\Access\PermissionService;
 use Closure;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class CheckPermission
         $user = $request->user();
         $tenant = app('tenant');
         if (! $user || ! $tenant) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => ErrorCode::PERMISSION_DENIED], 401);
         }
 
         $permissionList = explode('|', $permissions);
@@ -34,8 +35,6 @@ class CheckPermission
             }
         }
 
-        return response()->json([
-            'message' => 'Forbidden',
-        ], 403);
+        return response()->json(['error' => ErrorCode::PERMISSION_DENIED], 403);
     }
 }
