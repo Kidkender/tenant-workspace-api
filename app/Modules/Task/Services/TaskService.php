@@ -15,17 +15,19 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TaskService
 {
-    public function __construct(private ActivityLogService $activityLogService) {}
+    public function __construct(private ActivityLogService $activityLogService)
+    {
+    }
 
     public function getTasks(TaskFilterRequest $request): LengthAwarePaginator
     {
         $limit = $request->input('limit', 10);
 
         return Task::query()
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
-            ->when($request->assigned_to, fn ($q) => $q->where('assigned_to', $request->assigned_to))
-            ->when($request->created_by, fn ($q) => $q->where('created_by', $request->created_by))
-            ->when($request->search, fn ($q) => $q->where('title', 'like', "%{$request->search}%"))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->assigned_to, fn($q) => $q->where('assigned_to', $request->assigned_to))
+            ->when($request->created_by, fn($q) => $q->where('created_by', $request->created_by))
+            ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate($limit);
     }
@@ -42,7 +44,7 @@ class TaskService
 
     public function createTask(array $data, User $user, Tenant $tenant): Task
     {
-        if (! $tenant->hasUser($user->id)) {
+        if (!$tenant->hasUser($user->id)) {
             throw new \Exception(ErrorCode::TENANT_NOT_MEMBER);
         }
 
@@ -86,7 +88,7 @@ class TaskService
     {
         $user = User::findOrFail($userId);
 
-        if (! $tenant->hasUser($user->id)) {
+        if (!$tenant->hasUser($user->id)) {
             throw new AuthorizationException('User is not a member of this tenant');
         }
 

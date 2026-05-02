@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends Controller
 {
@@ -47,9 +48,11 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request)
     {
+        Log::debug('toi dayy roi ne');
         $request->user()
             ->unreadNotifications()
             ->where('data->tenant_id', app('tenant')->id)
+            ->get()
             ->markAsRead();
 
         return $this->success();

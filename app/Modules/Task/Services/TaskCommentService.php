@@ -2,6 +2,7 @@
 
 namespace App\Modules\Task\Services;
 
+use App\Events\TaskCommentCreated;
 use App\Modules\Activity\ActivityLogService;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Models\TaskComment;
@@ -11,7 +12,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class TaskCommentService
 {
-    public function __construct(private ActivityLogService $activityLogService) {}
+    public function __construct(private ActivityLogService $activityLogService)
+    {
+    }
 
     public function getComments(Task $task): Collection
     {
@@ -41,6 +44,7 @@ class TaskCommentService
             ->get();
 
         $recipients->each->notify(new TaskCommented($task, $comment));
+        broadcast(new TaskCommentCreated($comment))->toOthers();
 
         return $comment;
     }

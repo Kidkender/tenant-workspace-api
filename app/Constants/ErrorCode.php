@@ -26,5 +26,7 @@ class ErrorCode
 
     public const string TENANT_ALREADY_MEMBER = 'tenant.already_member';
 
+    public const string RESOURCE_NOT_FOUND = 'resource.not_found';
+
     public const string PERMISSION_DENIED = 'permission.denied';
 }

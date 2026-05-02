@@ -75,7 +75,7 @@ class TaskController extends Controller
 
     public function assign(Request $request, $id)
     {
-        $request->validate(['user_id' => 'required|uuid|exists:users,id']);
+        $request->validate(['user_id' => 'nullable|uuid|exists:users,id']);
 
         $tenant = app('tenant');
         $task = $this->taskService->getTask($tenant->id, $id);

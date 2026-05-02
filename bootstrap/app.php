@@ -2,16 +2,18 @@
 
 use App\Constants\ErrorCode;
 use App\Http\Middleware\CheckPermission;
-use Cassandra\Exception\AuthenticationException;
-use Cassandra\Exception\ValidationException;
+
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
+        channels: __DIR__.'/../routes/channels.php',
         web: __DIR__ . '/../routes/web.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
@@ -40,18 +42,22 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (ModelNotFoundException $e) {
             return response()->json([
-                'error' => 'resource.not_found',
+                'error' => ErrorCode::RESOURCE_NOT_FOUND,
             ], 404);
         });
 
         $exceptions->render(function (ValidationException $e) {
             return response()->json([
-                'error' => 'validation.failed',
+                'error' => ErrorCode::VALIDATION_FAILED,
                 'errors' => $e->errors(),
             ], 422);
         });
 
-        $exceptions->render(function (\Throwable $e) {
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
             \Log::error('Server error: ', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),

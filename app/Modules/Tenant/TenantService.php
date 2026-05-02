@@ -2,11 +2,13 @@
 
 namespace App\Modules\Tenant;
 
+use App\Constants\ErrorCode;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\Tenant\Models\TenantInvitation;
 use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\User\Models\User;
 use App\Notifications\TenantInvite;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -26,7 +28,7 @@ class TenantService
                 'owner_user_id' => $user->id,
             ]);
 
-            $ownerRoleId = Cache::rememberForever('role_id_owner', fn() => DB::table('roles')->where('name', 'owner')->value('id'));
+            $ownerRoleId = Cache::rememberForever('role_id_owner', fn () => DB::table('roles')->where('name', 'owner')->value('id'));
 
             TenantUser::create([
                 'tenant_id' => $tenant->id,
@@ -38,6 +40,48 @@ class TenantService
 
             return $tenant;
         });
+    }
+
+    public function updateTenant(Tenant $tenant, array $data): Tenant
+    {
+        $tenant->update(['name' => $data['name']]);
+
+        return $tenant->fresh();
+    }
+
+    public function removeMember(Tenant $tenant, string $userId, User $currentUser): void
+    {
+        if ($tenant->owner_user_id === $userId) {
+            throw new AuthorizationException(ErrorCode::PERMISSION_DENIED);
+        }
+
+        $currentTenantUser = TenantUser::where('tenant_id', $tenant->id)
+            ->where('user_id', $currentUser->id)
+            ->with('role')
+            ->firstOrFail();
+
+        if (! in_array($currentTenantUser->role?->name, ['owner', 'admin'])) {
+            throw new AuthorizationException(ErrorCode::PERMISSION_DENIED);
+        }
+
+        TenantUser::where('tenant_id', $tenant->id)
+            ->where('user_id', $userId)
+            ->delete();
+    }
+
+    public function updateMemberRole(Tenant $tenant, string $userId, int $roleId, User $currentUser): void
+    {
+        if ($tenant->owner_user_id === $userId) {
+            throw new AuthorizationException(ErrorCode::PERMISSION_DENIED);
+        }
+
+        if ($tenant->owner_user_id !== $currentUser->id) {
+            throw new AuthorizationException(ErrorCode::PERMISSION_DENIED);
+        }
+
+        TenantUser::where('tenant_id', $tenant->id)
+            ->where('user_id', $userId)
+            ->update(['role_id' => $roleId]);
     }
 
     private function generateUniqueSlug(string $name): string
@@ -85,6 +129,8 @@ class TenantService
                 'tenant_id' => $invitation->tenant_id,
                 'user_id' => $user->id,
                 'role_id' => $invitation->role_id,
+                'status' => 'active',
+                'joined_at' => now(),
             ]);
 
             $invitation->update([
