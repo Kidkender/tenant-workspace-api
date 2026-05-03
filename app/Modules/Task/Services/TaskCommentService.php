@@ -46,7 +46,7 @@ class TaskCommentService
         $recipients->each->notify(new TaskCommented($task, $comment));
         broadcast(new TaskCommentCreated($comment))->toOthers();
 
-        return $comment;
+        return $comment->load('user');
     }
 
     public function updateComment(TaskComment $comment, array $data): TaskComment
