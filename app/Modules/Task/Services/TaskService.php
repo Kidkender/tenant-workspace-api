@@ -4,6 +4,7 @@ namespace App\Modules\Task\Services;
 
 use App\Constants\ErrorCode;
 use App\Modules\Activity\ActivityLogService;
+use App\Modules\Billing\Services\BillingService;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Requests\TaskFilterRequest;
 use App\Modules\Tenant\Models\Tenant;
@@ -12,11 +13,14 @@ use App\Notifications\TaskAssigned;
 use App\Notifications\TaskStatusChanged;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class TaskService
 {
-    public function __construct(private ActivityLogService $activityLogService)
-    {
+    public function __construct(
+        private ActivityLogService $activityLogService,
+        private BillingService $billingService,
+    ) {
     }
 
     public function getTasks(TaskFilterRequest $request): LengthAwarePaginator
@@ -46,6 +50,10 @@ class TaskService
     {
         if (!$tenant->hasUser($user->id)) {
             throw new \Exception(ErrorCode::TENANT_NOT_MEMBER);
+        }
+
+        if (!$this->billingService->canCreateTask($tenant->id)) {
+            throw new BadRequestException(ErrorCode::TASK_LIMIT_EXCEEDED);
         }
 
         $task = Task::create([

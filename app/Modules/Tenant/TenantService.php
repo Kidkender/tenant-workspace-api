@@ -3,6 +3,8 @@
 namespace App\Modules\Tenant;
 
 use App\Constants\ErrorCode;
+use App\Modules\Billing\PlanService;
+use App\Modules\Billing\SubscriptionService;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\Tenant\Models\TenantInvitation;
 use App\Modules\Tenant\Models\TenantUser;
@@ -17,10 +19,18 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class TenantService
 {
+    public function __construct(
+        private PlanService $planService,
+        private SubscriptionService $subscriptionService
+    ) {}
+
     public function createTenant(array $data, $user): Tenant
     {
         return DB::transaction(function () use ($data, $user) {
             $slug = $this->generateUniqueSlug($data['name']);
+
+            $freePlan = $this->planService->getFreePlan();
+
             $tenant = Tenant::create([
                 'id' => Str::uuid(),
                 'name' => $data['name'],
@@ -37,6 +47,8 @@ class TenantService
                 'status' => 'active',
                 'joined_at' => now(),
             ]);
+
+            $this->subscriptionService->subscribe($tenant->id, $freePlan->id);
 
             return $tenant;
         });

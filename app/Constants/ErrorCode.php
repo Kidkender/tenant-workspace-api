@@ -29,4 +29,6 @@ class ErrorCode
     public const string RESOURCE_NOT_FOUND = 'resource.not_found';
 
     public const string PERMISSION_DENIED = 'permission.denied';
+
+    public const string TASK_LIMIT_EXCEEDED = 'task.limit_exceeded';
 }

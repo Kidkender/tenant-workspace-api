@@ -5,6 +5,7 @@ use App\Http\Middleware\ResolveTenant;
 use App\Modules\Access\Models\Role;
 use App\Modules\Activity\ActivityLogController;
 use App\Modules\Auth\AuthController;
+use App\Modules\Billing\PlanController;
 use App\Modules\Dashboard\DashboardController;
 use App\Modules\Task\Http\Controllers\TaskCommentController;
 use App\Modules\Task\Http\Controllers\TaskController;
@@ -13,6 +14,10 @@ use App\Modules\User\Models\User;
 use App\Modules\User\UserController;
 use App\Notifications\NotificationController;
 use Illuminate\Support\Facades\Route;
+
+// Public — pricing page
+Route::get('/plans', [PlanController::class, 'index']);
+Route::get('/plans/{id}', [PlanController::class, 'show']);
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -56,6 +61,10 @@ Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
     Route::get('/roles', fn () => response()->json(['data' => Role::whereIn('name', ['admin', 'member'])->get(['id', 'name'])]));
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/activity-logs', [ActivityLogController::class, 'index']);
+
+    // Subscription (tenant-scoped, owner only)
+    Route::get('/subscription', [PlanController::class, 'subscription']);
+    Route::post('/subscription', [PlanController::class, 'subscribe']);
 
     Route::prefix('/tasks')->group(function () {
         Route::get('/', [TaskController::class, 'index'])

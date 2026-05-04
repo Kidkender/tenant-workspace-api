@@ -2,10 +2,10 @@
 
 namespace App\Modules\Billing\Models;
 
-use App\Modules\Billing\Models\Subscription;
 use App\Modules\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,8 +17,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $price_yearly
  * @property int|null $max_users
  * @property array<array-key, mixed>|null $features
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Subscription> $subscriptions
+ * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan query()
@@ -28,8 +29,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan wherePriceMonthly($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan wherePriceYearly($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Tenant> $tenants
+ *
+ * @property-read Collection<int, Tenant> $tenants
  * @property-read int|null $tenants_count
+ *
  * @mixin \Eloquent
  */
 #[Table('plans')]
@@ -41,10 +44,14 @@ class Plan extends Model
     protected function casts(): array
     {
         return [
-            "features" => "array"
+            'features' => 'array',
         ];
     }
 
+    public function features()
+    {
+        return $this->hasMany(PlanFeature::class);
+    }
 
     public function tenants()
     {
@@ -55,5 +62,4 @@ class Plan extends Model
     {
         return $this->hasMany(Subscription::class);
     }
-
 }
