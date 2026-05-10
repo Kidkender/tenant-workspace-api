@@ -22,6 +22,9 @@ class RBACSeeder extends Seeder
             PermissionConstant::COMMENT_CREATE,
             PermissionConstant::COMMENT_DELETE,
             PermissionConstant::COMMENT_DELETE_ANY,
+            PermissionConstant::ATTACHMENT_CREATE,
+            PermissionConstant::ATTACHMENT_DELETE,
+            PermissionConstant::ATTACHMENT_DELETE_ANY,
         ];
 
         foreach ($permissions as $key) {
@@ -44,8 +47,11 @@ class RBACSeeder extends Seeder
                 PermissionConstant::TASK_UPDATE,
                 PermissionConstant::COMMENT_CREATE,
                 PermissionConstant::COMMENT_DELETE,
+                PermissionConstant::ATTACHMENT_CREATE,
+                PermissionConstant::ATTACHMENT_DELETE,
             ])->pluck('id')
         );
 
+        \Illuminate\Support\Facades\Cache::flush();
     }
 }

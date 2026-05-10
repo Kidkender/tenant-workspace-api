@@ -19,4 +19,10 @@ class Permission
     public const string COMMENT_DELETE = 'comment.delete';
 
     public const string COMMENT_DELETE_ANY = 'comment.delete.any';
+
+    public const string ATTACHMENT_CREATE = 'attachment.create';
+
+    public const string ATTACHMENT_DELETE = 'attachment.delete';
+
+    public const string ATTACHMENT_DELETE_ANY = 'attachment.delete.any';
 }

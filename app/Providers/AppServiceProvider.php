@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Modules\File\Models\TaskAttachment;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Models\TaskComment;
+use App\Policies\TaskAttachmentPolicy;
 use App\Policies\TaskCommentPolicy;
 use App\Policies\TaskPolicy;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -28,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Task::class, TaskPolicy::class);
         Gate::policy(TaskComment::class, TaskCommentPolicy::class);
+        Gate::policy(TaskAttachment::class, TaskAttachmentPolicy::class);
 
         VerifyEmail::toMailUsing(function (object $notifiable, string $url): MailMessage {
             return (new MailMessage)

@@ -3,17 +3,15 @@
 namespace App\Modules\Billing\Services;
 
 use App\Constants\ErrorCode;
+use App\Constants\Feature;
 use App\Modules\Billing\Models\Plan;
 use App\Modules\Billing\Models\PlanFeature;
 use App\Modules\Billing\Models\Subscription;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PlanService
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function getPlans()
     {
@@ -37,13 +35,11 @@ class PlanService
 
     public function getFeature($planId, $featureKey): PlanFeature
     {
-        Log::info('planId: ' . $planId . ', featureKey: ' . $featureKey);
-
         $planFeature = PlanFeature::where('plan_id', $planId)
             ->where('feature_key', $featureKey)
             ->first();
 
-        if (!$planFeature) {
+        if (! $planFeature) {
             throw new NotFoundHttpException(ErrorCode::FEATURE_NOT_FOUND);
         }
 
@@ -55,7 +51,7 @@ class PlanService
         $subscription = Subscription::where('status', 'active')
             ->where('tenant_id', $tenantId)->first();
 
-        if (!$subscription) {
+        if (! $subscription) {
             return null;
         }
 
@@ -90,8 +86,9 @@ class PlanService
         }
 
         return match ($key) {
-            'task_limit', 'member_limit' => (int) $value,
-            'can_create_task' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            Feature::TASK_LIMIT, Feature::MEMBER_LIMIT, Feature::TENANT_LIMIT, Feature::STORAGE_MB => (int) $value,
+            Feature::CAN_CREATE_TASK, Feature::ACTIVITY_LOG, Feature::EMAIL_INVITE,
+            Feature::CUSTOM_ROLES, Feature::ANALYTICS, Feature::REALTIME => filter_var($value, FILTER_VALIDATE_BOOLEAN),
             default => $value,
         };
     }

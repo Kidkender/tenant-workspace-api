@@ -2,12 +2,13 @@
 
 namespace App\Modules\Billing\Models;
 
-use App\Modules\Billing\Models\Plan;
 use App\Modules\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,9 +16,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $plan_id
  * @property string $status
  * @property string $started_at
- * @property \Illuminate\Support\Carbon|null $expired_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $expired_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
@@ -29,21 +31,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereTenantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereUpdatedAt($value)
+ *
  * @property-read Plan $plan
  * @property-read Tenant $tenant
+ *
  * @mixin \Eloquent
  */
-#[Table("subscriptions")]
-#[Fillable("tenant_id", "plan_id", "status", "started_at", "expired_at")]
+#[Table('subscriptions')]
+#[Fillable('tenant_id', 'plan_id', 'status', 'started_at', 'expired_at')]
 class Subscription extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected function casts(): array
     {
         return [
-            "started_at" => "datetime",
-            "expired_at" => "datetime",
+            'started_at' => 'datetime',
+            'expired_at' => 'datetime',
         ];
     }
 
@@ -56,7 +60,6 @@ class Subscription extends Model
     {
         return $this->belongsTo(Plan::class);
     }
-
 
     public function isActive(): bool
     {

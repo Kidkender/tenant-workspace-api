@@ -7,6 +7,7 @@ use App\Modules\Activity\ActivityLogController;
 use App\Modules\Auth\AuthController;
 use App\Modules\Billing\PlanController;
 use App\Modules\Dashboard\DashboardController;
+use App\Modules\File\TaskAttachmentController;
 use App\Modules\Task\Http\Controllers\TaskCommentController;
 use App\Modules\Task\Http\Controllers\TaskController;
 use App\Modules\Tenant\TenantController;
@@ -95,6 +96,24 @@ Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
 
             Route::delete('/{commentId}', [TaskCommentController::class, 'destroy'])
                 ->middleware('permission:' . Permission::COMMENT_DELETE);
+
+            Route::post('/{commentId}/attachments', [TaskAttachmentController::class, 'storeComment'])
+                ->middleware('permission:' . Permission::ATTACHMENT_CREATE);
+        });
+
+        Route::prefix('{taskId}/attachments')->group(function () {
+
+            Route::get('/', [TaskAttachmentController::class, 'index'])
+                ->middleware('permission:' . Permission::TASK_VIEW);
+
+            Route::post('/', [TaskAttachmentController::class, 'store'])
+                ->middleware('permission:' . Permission::ATTACHMENT_CREATE);
+
+            Route::get('/{attachmentId}/download', [TaskAttachmentController::class, 'download'])
+                ->middleware('permission:' . Permission::TASK_VIEW);
+
+            Route::delete('/{attachmentId}', [TaskAttachmentController::class, 'destroy'])
+                ->middleware('permission:' . Permission::ATTACHMENT_DELETE);
         });
     });
 

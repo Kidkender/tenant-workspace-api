@@ -39,4 +39,8 @@ class ErrorCode
     public const string BAD_REQUEST = 'bad.request';
 
     public const string FEATURE_NOT_FOUND = 'feature.not_found';
+
+    public const string ATTACHMENT_NOT_FOUND = 'attachment.not_found';
+
+    public const string ATTACHMENT_UPLOAD_FAILED = 'attachment.upload_failed';
 }

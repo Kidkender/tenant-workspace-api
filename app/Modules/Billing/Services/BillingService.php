@@ -2,6 +2,7 @@
 
 namespace App\Modules\Billing\Services;
 
+use App\Constants\Feature;
 use App\Modules\Task\Models\Task;
 use App\Modules\Tenant\Models\TenantUser;
 
@@ -11,11 +12,11 @@ class BillingService
 
     public function canCreateTask(string $tenantId): bool
     {
-        if (! $this->planService->canUseFeature('can_create_task', $tenantId)) {
+        if (! $this->planService->canUseFeature(Feature::CAN_CREATE_TASK, $tenantId)) {
             return false;
         }
 
-        $limit = $this->planService->getFeatureValueByTenant('task_limit', $tenantId);
+        $limit = $this->planService->getFeatureValueByTenant(Feature::TASK_LIMIT, $tenantId);
 
         if ($limit === null) {
             return true;
@@ -26,7 +27,7 @@ class BillingService
 
     public function canAddMember(string $tenantId): bool
     {
-        $limit = $this->planService->getFeatureValueByTenant('member_limit', $tenantId);
+        $limit = $this->planService->getFeatureValueByTenant(Feature::MEMBER_LIMIT, $tenantId);
 
         if ($limit === null) {
             return true;

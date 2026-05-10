@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 
 class TenantController extends Controller
 {
-    public function __construct(private TenantService $tenantService) {}
+    public function __construct(private TenantService $tenantService)
+    {
+    }
 
     public function store(StoreTenantRequest $request)
     {
@@ -48,7 +50,7 @@ class TenantController extends Controller
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->get()
-            ->map(fn (TenantUser $tu) => [
+            ->map(fn(TenantUser $tu) => [
                 'id' => $tu->user->id,
                 'name' => $tu->user->name,
                 'email' => $tu->user->email,
