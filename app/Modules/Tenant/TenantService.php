@@ -3,12 +3,14 @@
 namespace App\Modules\Tenant;
 
 use App\Constants\ErrorCode;
-use App\Modules\Billing\PlanService;
-use App\Modules\Billing\SubscriptionService;
+use App\Modules\Billing\Services\BillingService;
+use App\Modules\Billing\Services\PlanService;
+use App\Modules\Billing\Services\SubscriptionService;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\Tenant\Models\TenantInvitation;
 use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\User\Models\User;
+use App\Modules\User\UserService;
 use App\Notifications\TenantInvite;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Cache;
@@ -16,12 +18,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TenantService
 {
     public function __construct(
         private PlanService $planService,
-        private SubscriptionService $subscriptionService
+        private SubscriptionService $subscriptionService,
+        private BillingService $billingService,
+        private UserService $userService,
     ) {}
 
     public function createTenant(array $data, $user): Tenant
@@ -112,6 +117,11 @@ class TenantService
 
     public function invite(Tenant $tenant, string $email, int $roleId)
     {
+        $user = $this->userService->getByEmail($email);
+        if (! $user) {
+            throw new NotFoundHttpException(ErrorCode::USER_NOT_FOUND);
+        }
+
         $invitation = TenantInvitation::create(
             [
                 'tenant_id' => $tenant->id,
@@ -123,7 +133,7 @@ class TenantService
             ]
         );
 
-        Notification::route('mail', $email)->notify(new TenantInvite($invitation));
+        Notification::route('mail', $email)->notify(new TenantInvite($invitation, $tenant->name));
 
         return $invitation;
     }
@@ -134,6 +144,10 @@ class TenantService
 
         if ($invitation->expired_at < now()) {
             throw new BadRequestException('Invitation Expired');
+        }
+
+        if (! $this->billingService->canAddMember($invitation->tenant_id)) {
+            throw new BadRequestException(ErrorCode::MEMBER_LIMIT_EXCEEDED);
         }
 
         DB::transaction(function () use ($invitation, $user) {

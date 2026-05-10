@@ -5,10 +5,13 @@ namespace App\Modules\User;
 use App\Modules\Access\Models\Role;
 use App\Modules\Access\PermissionService;
 use App\Modules\User\Models\User;
+use PhpOption\None;
 
 class UserService
 {
-    public function __construct(private PermissionService $permissionService) {}
+    public function __construct(private PermissionService $permissionService)
+    {
+    }
 
     public function updateMe(User $user, array $data): array
     {
@@ -47,5 +50,11 @@ class UserService
             ],
             'tenants' => $tenantData,
         ];
+    }
+
+    public function getByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
+
     }
 }

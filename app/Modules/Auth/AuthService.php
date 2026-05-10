@@ -6,11 +6,14 @@ use App\Constants\ErrorCode;
 use App\Modules\User\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AuthService
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function register(array $data): User
     {
@@ -30,11 +33,13 @@ class AuthService
     {
         $user = User::where('email', $data['email'])->first();
 
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
+
+        if (!$user || !Hash::check($data['password'], $user->password)) {
+            Log::info('vao day');
             throw new \Exception(ErrorCode::AUTH_INVALID_CREDENTIALS);
         }
 
-        if (! $user->hasVerifiedEmail()) {
+        if (!$user->hasVerifiedEmail()) {
             throw new \Exception(ErrorCode::AUTH_EMAIL_NOT_VERIFIED);
         }
 

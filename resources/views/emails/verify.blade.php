@@ -1,30 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <tle>Vrify Email</title>
-</head>
-<body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px;">
+@extends('emails.layouts.base')
 
-    <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px;">
+@section('title', 'Verify your email — Tenant Workspace')
 
-        <h2>🚀 Welcome {{ $user->name ?? 'User' }}</h2>
+@section('content')
 
-        <p>Please verify your email to activate your account.</p>
-
-        <div style="margin: 20px 0;">
-            <a href="{{ $url }}"
-               style="padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
-                Verify Email
-            </a>
-        </div>
-
-        <p>If you did not create this account, you can ignore this email.</p>
-
-        <hr>
-
-        <small>This link will expire in 60 minutes.</small>
+  {{-- Icon --}}
+  <div style="text-align:center;margin-bottom:28px;">
+    <div style="display:inline-block;background:#eff6ff;border-radius:50%;width:56px;height:56px;line-height:56px;font-size:26px;">
+      ✉️
     </div>
+  </div>
 
-</body>
-</html>
+  {{-- Heading --}}
+  <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#0f172a;text-align:center;">
+    Verify your email address
+  </h1>
+  <p style="margin:0 0 28px;font-size:14px;color:#64748b;text-align:center;line-height:1.6;">
+    Hi <strong style="color:#0f172a;">{{ $user->name ?? 'there' }}</strong>, thanks for signing up!<br />
+    Click the button below to confirm your email and activate your account.
+  </p>
+
+  {{-- CTA Button --}}
+  <div style="text-align:center;margin-bottom:28px;">
+    <a href="{{ $url }}"
+       style="display:inline-block;padding:13px 32px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:10px;letter-spacing:.01em;">
+      Verify Email Address
+    </a>
+  </div>
+
+  {{-- Fallback URL --}}
+  <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0 0 24px;line-height:1.6;">
+    If the button doesn't work, copy and paste this link into your browser:<br />
+    <a href="{{ $url }}" style="color:#3b82f6;word-break:break-all;">{{ $url }}</a>
+  </p>
+
+  {{-- Divider --}}
+  <hr style="border:none;border-top:1px solid #f1f5f9;margin:0 0 20px;" />
+
+  {{-- Footer note --}}
+  <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0;line-height:1.6;">
+    This link expires in <strong>60 minutes</strong>. If you didn't create an account, you can safely ignore this email.
+  </p>
+
+@endsection

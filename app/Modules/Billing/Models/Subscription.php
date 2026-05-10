@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 #[Table("subscriptions")]
-#[Fillable("tenant_id", "plan_id", "status", "status", "start_at", "expired_at")]
+#[Fillable("tenant_id", "plan_id", "status", "started_at", "expired_at")]
 class Subscription extends Model
 {
     use HasFactory;
@@ -42,7 +42,7 @@ class Subscription extends Model
     protected function casts(): array
     {
         return [
-            "start_at" => "datetime",
+            "started_at" => "datetime",
             "expired_at" => "datetime",
         ];
     }

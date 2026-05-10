@@ -23,7 +23,7 @@ class SubscriptionService
             'tenant_id' => $tenantId,
             'plan_id' => $planId,
             'status' => 'active',
-            'start_at' => now(),
+            'started_at' => now(),
             'expired_at' => now()->addMonth(),
         ]);
     }

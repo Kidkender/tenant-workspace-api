@@ -31,4 +31,12 @@ class ErrorCode
     public const string PERMISSION_DENIED = 'permission.denied';
 
     public const string TASK_LIMIT_EXCEEDED = 'task.limit_exceeded';
+
+    public const string MEMBER_LIMIT_EXCEEDED = 'member.limit_exceeded';
+
+    public const string USER_NOT_FOUND = 'user.not_found';
+
+    public const string BAD_REQUEST = 'bad.request';
+
+    public const string FEATURE_NOT_FOUND = 'feature.not_found';
 }

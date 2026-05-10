@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RBACSeeder::class,
             PlanSeeder::class,
+            AccountSeeder::class,
         ]);
     }
 }

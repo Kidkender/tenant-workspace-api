@@ -14,10 +14,10 @@ class TenantInvite extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public TenantInvitation $invitation)
-    {
-        //
-    }
+    public function __construct(
+        public TenantInvitation $invitation,
+        public string $tenantName = '',
+    ) {}
 
     /**
      * Get the notification's delivery channels.
@@ -35,11 +35,15 @@ class TenantInvite extends Notification
     public function toMail(object $notifiable): MailMessage
     {
 
-        $url = config('app.frontend_url') . '/accept-invite?token=' . $this->invitation->token;
+        $url = config('app.frontend_url').'/accept-invite?token='.$this->invitation->token;
 
         return (new MailMessage)
-            ->line('You have been invited to join a workspace.')
-            ->view('emails.invite', ['url' => $url, 'invitation' => $this->invitation]);
+            ->subject('You\'ve been invited to '.($this->tenantName ?: 'a workspace').' — Tenant Workspace')
+            ->view('emails.invite', [
+                'url' => $url,
+                'invitation' => $this->invitation,
+                'tenantName' => $this->tenantName,
+            ]);
     }
 
     /**
