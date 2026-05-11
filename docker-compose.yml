@@ -1,0 +1,18 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/var/www
+        command: php-fpm
+    reverb:
+        image: php:8.2-cli
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+        command: php artisan reverb:start --host:0.0.0.0 --port=8080
+        ports:
+            - "8080:8080"
+        depends_on:
+            - app
