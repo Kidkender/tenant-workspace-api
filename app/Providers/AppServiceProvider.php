@@ -10,6 +10,7 @@ use App\Policies\TaskCommentPolicy;
 use App\Policies\TaskPolicy;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Broadcast::routes(['middleware' => ['auth:sanctum']]);
+
         Gate::policy(Task::class, TaskPolicy::class);
         Gate::policy(TaskComment::class, TaskCommentPolicy::class);
         Gate::policy(TaskAttachment::class, TaskAttachmentPolicy::class);

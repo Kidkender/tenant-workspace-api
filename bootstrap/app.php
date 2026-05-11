@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn() => null);
+        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
+        $middleware->validateCsrfTokens(except: ['broadcasting/auth']);
         $middleware->alias([
             'permission' => CheckPermission::class
         ]);
