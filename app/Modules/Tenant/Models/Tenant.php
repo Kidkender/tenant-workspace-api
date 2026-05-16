@@ -3,6 +3,7 @@
 namespace App\Modules\Tenant\Models;
 
 use App\Modules\Billing\Models\Plan;
+use App\Modules\Billing\Models\Subscription;
 use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -33,9 +34,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tenant whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tenant whereUpdatedAt($value)
  * @property-read Plan|null $plan
+ * @property-read Subscription|null $subscription
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'slug', 'plan_id', 'owner_user_id'])]
+#[Fillable(['name', 'slug', 'plan_id', 'status', 'owner_user_id'])]
 #[Table('tenants')]
 class Tenant extends Model
 {
@@ -61,6 +63,11 @@ class Tenant extends Model
     public function plan()
     {
         return $this->belongsTo(Plan::class, 'plan_id');
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class, 'tenant_id');
     }
 
     public function hasUser(string $userId): bool

@@ -6,17 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->string('notifiable_id', 36)->change();
+        Schema::table('roles', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->unsignedBigInteger('notifiable_id')->change();
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropSoftDeletes();
         });
     }
 };

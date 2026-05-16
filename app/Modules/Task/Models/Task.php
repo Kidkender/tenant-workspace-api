@@ -30,7 +30,6 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, TaskComment> $comments
  * @property-read int|null $comments_count
  * @property-read User $creator
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task query()
@@ -44,9 +43,9 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereTenantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Task whereUpdatedAt($value)
- *
  * @property-read Tenant $tenant
- *
+ * @property-read Collection<int, TaskAttachment> $attachments
+ * @property-read int|null $attachments_count
  * @mixin \Eloquent
  */
 #[Table('tasks')]

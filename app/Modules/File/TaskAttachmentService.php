@@ -3,9 +3,12 @@
 namespace App\Modules\File;
 
 use App\Constants\ErrorCode;
+use App\Modules\Billing\Models\Subscription;
+use App\Modules\Billing\Services\SubscriptionService;
 use App\Modules\File\Models\TaskAttachment;
 use App\Modules\Task\Models\Task;
 use App\Modules\Task\Models\TaskComment;
+use App\Modules\Tenant\Models\Tenant;
 use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
@@ -16,6 +19,11 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class TaskAttachmentService
 {
+
+    public function __construct(private SubscriptionService $subscriptionService)
+    {
+    }
+
     public function getAttachments(Task $task): Collection
     {
         return $task->attachments()->with('uploader')->latest()->get();
@@ -32,8 +40,14 @@ class TaskAttachmentService
         return $attachment;
     }
 
-    public function upload(Task $task, User $user, UploadedFile $file): TaskAttachment
+    public function upload(Tenant $tenant, $task, User $user, UploadedFile $file): TaskAttachment
     {
+        $maxFileUploadSize = $this->subscriptionService->getMaxUploadSize($tenant->id);
+
+        if ($maxFileUploadSize && $file->getSize() > $maxFileUploadSize * 1024 * 1024) {
+            throw new UnprocessableEntityHttpException(ErrorCode::ATTACHMENT_UPLOAD_FAILED);
+        }
+
         $path = $file->store(
             "attachments/{$task->tenant_id}/{$task->id}",
             'local'
@@ -69,8 +83,14 @@ class TaskAttachmentService
         );
     }
 
-    public function uploadComment(Task $task, TaskComment $comment, User $user, UploadedFile $file): TaskAttachment
+    public function uploadComment(Tenant $tenant, Task $task, TaskComment $comment, User $user, UploadedFile $file): TaskAttachment
     {
+        $maxFileUploadSize = $this->subscriptionService->getMaxUploadSize($tenant->id);
+
+        if ($maxFileUploadSize && $file->getSize() > $maxFileUploadSize * 1024 * 1024) {
+            throw new UnprocessableEntityHttpException(ErrorCode::ATTACHMENT_UPLOAD_FAILED);
+        }
+
         $path = $file->store(
             "attachments/{$task->tenant_id}/{$task->id}",
             'local'

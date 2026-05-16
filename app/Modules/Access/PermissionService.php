@@ -49,4 +49,14 @@ class PermissionService
         });
         return in_array($permissionKey, $permissions);
     }
+
+    public function invalidateRoleCache(int $roleId): void
+    {
+        TenantUser::where('role_id', $roleId)
+            ->get()
+            ->each(function (TenantUser $tu) {
+                Cache::forget("perm:{$tu->user_id}:{$tu->tenant_id}");
+                Cache::forget("user:{$tu->user_id}:tenant:{$tu->tenant_id}:permissions");
+            });
+    }
 }

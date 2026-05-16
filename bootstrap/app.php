@@ -9,8 +9,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,51 +26,50 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn() => null);
-        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
-        $middleware->validateCsrfTokens(except: ['broadcasting/auth']);
+        $middleware->prepend(HandleCors::class);
+        $middleware->preventRequestForgery(except: ['broadcasting/auth']);
         $middleware->alias([
             'permission' => CheckPermission::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(fn($request) => $request->is('api/*'));
+        $exceptions->shouldRenderJsonWhen(fn($request) => $request->is('api/*') || $request->expectsJson());
 
-        $exceptions->render(function (BadRequestHttpException $e) {
-            return response()->json([
-                'error' => ErrorCode::BAD_REQUEST
-            ], 400);
-        });
+        $exceptions->render(fn(BadRequestHttpException $e) => response()->json([
+            'message' => $e->getMessage() ?: ErrorCode::BAD_REQUEST,
+            'error' => ErrorCode::BAD_REQUEST,
+        ], 400));
 
-        $exceptions->render(function (AuthenticationException $e) {
-            return response()->json([
-                'error' => ErrorCode::AUTH_UNAUTHORIZED
-            ], 401);
-        });
+        $exceptions->render(fn(AuthenticationException $e) => response()->json([
+            'error' => ErrorCode::AUTH_UNAUTHORIZED
+        ], 401));
 
-        $exceptions->render(function (AuthorizationException $e) {
-            return response()->json([
-                'error' => ErrorCode::AUTH_FORBIDDEN,
-            ], 403);
-        });
+        $exceptions->render(fn(AccessDeniedHttpException $e) => response()->json([
+            'error' => $e->getMessage() ?: ErrorCode::AUTH_FORBIDDEN,
+        ], 403));
 
-        $exceptions->render(function (ModelNotFoundException $e) {
-            return response()->json([
-                'error' => ErrorCode::RESOURCE_NOT_FOUND,
-            ], 404);
-        });
+        $exceptions->render(fn(AuthorizationException $e) => response()->json([
+            'error' => ErrorCode::AUTH_FORBIDDEN,
+        ], 403));
 
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e) {
-            return response()->json([
-                'error' => $e->getMessage() ?: ErrorCode::RESOURCE_NOT_FOUND,
-            ], 404);
-        });
+        $exceptions->render(fn(ModelNotFoundException $e) => response()->json([
+            'error' => ErrorCode::RESOURCE_NOT_FOUND,
+        ], 404));
 
-        $exceptions->render(function (ValidationException $e) {
-            return response()->json([
-                'error' => ErrorCode::VALIDATION_FAILED,
-                'errors' => $e->errors(),
-            ], 422);
-        });
+        $exceptions->render(fn(NotFoundHttpException $e) => response()->json([
+            'error' => $e->getMessage() ?: ErrorCode::RESOURCE_NOT_FOUND,
+        ], 404));
+
+        $exceptions->render(fn(ValidationException $e) => response()->json([
+            'error' => ErrorCode::VALIDATION_FAILED,
+            'errors' => $e->errors(),
+        ], 422));
+
+
+        $exceptions->render(fn(ThrottleRequestsException $e) => response()->json([
+            'error' => ErrorCode::TOO_MANY_REQUESTS,
+        ], 429));
+
 
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
             if (!$request->is('api/*')) {

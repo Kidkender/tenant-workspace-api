@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('tenant_invitations', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->uuid('tenant_id');
             $table->unsignedBigInteger('role_id');
             $table->string('token')->unique();

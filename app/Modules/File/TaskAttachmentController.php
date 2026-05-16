@@ -36,7 +36,7 @@ class TaskAttachmentController extends Controller
 
         $this->authorize('create', [TaskAttachment::class, $task]);
 
-        $attachment = $this->attachmentService->upload($task, $request->user(), $request->file('file'));
+        $attachment = $this->attachmentService->upload($tenant, $task, $request->user(), $request->file('file'));
 
         return $this->success($attachment->load('uploader'), [], 'Attachment uploaded successfully', 201);
     }
@@ -71,7 +71,7 @@ class TaskAttachmentController extends Controller
 
         $this->authorize('create', [TaskAttachment::class, $task]);
 
-        $attachment = $this->attachmentService->uploadComment($task, $comment, $request->user(), $request->file('file'));
+        $attachment = $this->attachmentService->uploadComment($tenant, $task, $comment, $request->user(), $request->file('file'));
 
         return $this->success($attachment->load('uploader'), [], 'Attachment uploaded successfully', 201);
     }

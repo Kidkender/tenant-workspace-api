@@ -3,6 +3,7 @@
 namespace App\Modules\Tenant;
 
 use App\Constants\ErrorCode;
+use App\Modules\Billing\Models\Subscription;
 use App\Modules\Billing\Services\BillingService;
 use App\Modules\Billing\Services\PlanService;
 use App\Modules\Billing\Services\SubscriptionService;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TenantService
@@ -27,10 +29,15 @@ class TenantService
         private SubscriptionService $subscriptionService,
         private BillingService $billingService,
         private UserService $userService,
-    ) {}
+    ) {
+    }
 
     public function createTenant(array $data, $user): Tenant
     {
+        if (!$this->billingService->canCreateTenant($user->id)) {
+            throw new BadRequestHttpException(ErrorCode::TENANT_LIMIT_EXCEEDED);
+        }
+
         return DB::transaction(function () use ($data, $user) {
             $slug = $this->generateUniqueSlug($data['name']);
 
@@ -43,7 +50,7 @@ class TenantService
                 'owner_user_id' => $user->id,
             ]);
 
-            $ownerRoleId = Cache::rememberForever('role_id_owner', fn () => DB::table('roles')->where('name', 'owner')->value('id'));
+            $ownerRoleId = Cache::rememberForever('role_id_owner', fn() => DB::table('roles')->where('name', 'owner')->value('id'));
 
             TenantUser::create([
                 'tenant_id' => $tenant->id,
@@ -77,7 +84,7 @@ class TenantService
             ->with('role')
             ->firstOrFail();
 
-        if (! in_array($currentTenantUser->role?->name, ['owner', 'admin'])) {
+        if (!in_array($currentTenantUser->role?->name, ['owner', 'admin'])) {
             throw new AuthorizationException(ErrorCode::PERMISSION_DENIED);
         }
 
@@ -118,7 +125,7 @@ class TenantService
     public function invite(Tenant $tenant, string $email, int $roleId)
     {
         $user = $this->userService->getByEmail($email);
-        if (! $user) {
+        if (!$user) {
             throw new NotFoundHttpException(ErrorCode::USER_NOT_FOUND);
         }
 
@@ -146,7 +153,7 @@ class TenantService
             throw new BadRequestException('Invitation Expired');
         }
 
-        if (! $this->billingService->canAddMember($invitation->tenant_id)) {
+        if (!$this->billingService->canAddMember($invitation->tenant_id)) {
             throw new BadRequestException(ErrorCode::MEMBER_LIMIT_EXCEEDED);
         }
 
@@ -164,4 +171,6 @@ class TenantService
             ]);
         });
     }
+
+
 }

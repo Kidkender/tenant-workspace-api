@@ -4,11 +4,12 @@ namespace App\Modules\Auth;
 
 use App\Constants\ErrorCode;
 use App\Http\Controllers\Controller;
+use App\Modules\Auth\Requests\ForgotPassword;
 use App\Modules\Auth\Requests\LoginRequest;
 use App\Modules\Auth\Requests\RegisterRequest;
+use App\Modules\Auth\Requests\ResetPassword;
 use App\Modules\User\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -51,5 +52,21 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'verification_email_sent'], 200);
+    }
+
+    public function forgotPassword(ForgotPassword $request)
+    {
+        $data = $request->validated();
+        $this->authService->forgotPassword($data);
+
+        return $this->success();
+    }
+
+    public function resetPassword(ResetPassword $request)
+    {
+        $data = $request->validated();
+        $this->authService->resetPassword($data);
+
+        return $this->success();
     }
 }

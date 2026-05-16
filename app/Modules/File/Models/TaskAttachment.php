@@ -21,10 +21,23 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $size
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
  * @property-read Task $task
  * @property-read User $uploader
- *
+ * @property string|null $comment_id
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereCommentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereFileName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereTaskId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereTenantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TaskAttachment whereUploadedBy($value)
  * @mixin \Eloquent
  */
 #[Table('task_attachments')]

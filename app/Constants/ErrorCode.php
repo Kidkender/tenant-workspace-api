@@ -8,6 +8,8 @@ class ErrorCode
 
     public const string AUTH_EMAIL_NOT_VERIFIED = 'auth.email_not_verified';
 
+    public const string AUTH_CODE_EXPIRED = 'auth.code_expired';
+
     public const string AUTH_EMAIL_TAKEN = 'auth.email_taken';
 
     public const string AUTH_UNAUTHORIZED = 'auth.unauthorized';
@@ -43,4 +45,13 @@ class ErrorCode
     public const string ATTACHMENT_NOT_FOUND = 'attachment.not_found';
 
     public const string ATTACHMENT_UPLOAD_FAILED = 'attachment.upload_failed';
+
+    public const string TOO_MANY_REQUESTS = 'too_many_requests';
+
+    public const string TENANT_LIMIT_EXCEEDED = 'tenant.limit_exceeded';
+
+    public const string ROLE_NOT_FOUND = 'role.not_found';
+    public const string ROLE_IN_USE = 'role.in_use';
+    public const string ROLE_SYSTEM_PROTECTED = 'role.system_protected';
+    public const string ROLE_OWNER_PROTECTED = 'role.owner_protected';
 }

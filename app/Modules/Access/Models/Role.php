@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable('name', 'description', 'tenant_id')]
 class Role extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public $timestamps = false;
 
@@ -44,4 +45,13 @@ class Role extends Model
         return $this->hasMany(TenantUser::class);
     }
 
+    public function isSystemRole(): bool
+    {
+        return $this->tenant_id === null;
+    }
+
+    public function isOwnerRole(): bool
+    {
+        return $this->name === 'owner';
+    }
 }

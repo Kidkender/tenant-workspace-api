@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<array-key, mixed>|null $features
  * @property-read Collection<int, Subscription> $subscriptions
  * @property-read int|null $subscriptions_count
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan query()
@@ -29,10 +28,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan wherePriceMonthly($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Plan wherePriceYearly($value)
- *
  * @property-read Collection<int, Tenant> $tenants
  * @property-read int|null $tenants_count
- *
+ * @property-read int|null $features_count
  * @mixin \Eloquent
  */
 #[Table('plans')]

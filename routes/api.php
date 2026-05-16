@@ -3,6 +3,7 @@
 use App\Constants\Permission;
 use App\Http\Middleware\ResolveTenant;
 use App\Modules\Access\Models\Role;
+use App\Modules\Access\RoleController;
 use App\Modules\Activity\ActivityLogController;
 use App\Modules\Auth\AuthController;
 use App\Modules\Billing\PlanController;
@@ -33,6 +34,8 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
 
     return redirect(env('FRONTEND_URL') . '/email-verified');
 })->middleware(['signed'])->name('verification.verify');
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
 
 Route::post('/email/verify/resend', [AuthController::class, 'resendEmailVerification']);
 
@@ -58,7 +61,11 @@ Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
     Route::put('/tenant/members/{userId}/role', [TenantController::class, 'updateMemberRole']);
     Route::put('/tenants/settings', [TenantController::class, 'update']);
     Route::post('/tenants/invite', [TenantController::class, 'invite']);
-    Route::get('/roles', fn() => response()->json(['data' => Role::whereIn('name', ['admin', 'member'])->get(['id', 'name'])]));
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::get('/permissions', [RoleController::class, 'permissions']);
+    Route::post('/roles/custom', [RoleController::class, 'store']);
+    Route::put('/roles/custom/{roleId}', [RoleController::class, 'update']);
+    Route::delete('/roles/custom/{roleId}', [RoleController::class, 'destroy']);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 

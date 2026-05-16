@@ -3,10 +3,13 @@
 namespace App\Modules\Billing\Services;
 
 use App\Modules\Billing\Models\Subscription;
+use Symfony\Component\Mime\Part\SMimePart;
 
 class SubscriptionService
 {
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function getActiveByTenant($tenantId): ?Subscription
     {

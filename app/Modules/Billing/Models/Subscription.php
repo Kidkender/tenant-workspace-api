@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $expired_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription query()
@@ -31,10 +30,8 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereTenantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Subscription whereUpdatedAt($value)
- *
  * @property-read Plan $plan
  * @property-read Tenant $tenant
- *
  * @mixin \Eloquent
  */
 #[Table('subscriptions')]

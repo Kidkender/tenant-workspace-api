@@ -43,6 +43,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property-read int|null $tenants_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
+ * @property string|null $reset_code
+ * @property string|null $reset_code_expires_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereResetCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereResetCodeExpiresAt($value)
  * @mixin \Eloquent
  */
 #[Fillable(['name', 'email', 'password'])]
@@ -52,6 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasUuids, HasApiTokens;
+
+    protected static function newFactory(): UserFactory
+    {
+        return UserFactory::new();
+    }
 
     /**
      * Get the attributes that should be cast.

@@ -2,13 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Modules\Tenant\Models\TenantInvitation;
+use App\Modules\User\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TenantInvite extends Notification implements ShouldQueue
+class ResetPassword extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -16,9 +16,10 @@ class TenantInvite extends Notification implements ShouldQueue
      * Create a new notification instance.
      */
     public function __construct(
-        public TenantInvitation $invitation,
-        public string $tenantName = '',
+        private User $user,
+        private string $reset,
     ) {
+
     }
 
     /**
@@ -36,15 +37,11 @@ class TenantInvite extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-
-        $url = config('app.frontend_url') . '/accept-invite?token=' . $this->invitation->token;
-
         return (new MailMessage)
-            ->subject('You\'ve been invited to ' . ($this->tenantName ?: 'a workspace') . ' — Tenant Workspace')
-            ->view('emails.invite', [
-                'url' => $url,
-                'invitation' => $this->invitation,
-                'tenantName' => $this->tenantName,
+            ->subject('Password Reset')
+            ->view('emails.reset-password', [
+                'code' => $this->reset,
+                'name' => $this->user->name,
             ]);
     }
 

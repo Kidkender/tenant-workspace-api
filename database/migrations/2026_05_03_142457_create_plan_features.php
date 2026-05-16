@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('plan_features', function (Blueprint $table) {
-            $table->id('id')->primary();
+            $table->id();
 
             $table->unsignedBigInteger('plan_id');
 
