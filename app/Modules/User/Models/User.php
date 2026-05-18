@@ -47,6 +47,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string|null $reset_code_expires_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereResetCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereResetCodeExpiresAt($value)
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @mixin \Eloquent
  */
 #[Fillable(['name', 'email', 'password'])]

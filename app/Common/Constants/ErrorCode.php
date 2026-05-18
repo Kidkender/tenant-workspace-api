@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Constants;
+namespace App\Common\Constants;
 
 class ErrorCode
 {
@@ -51,7 +51,10 @@ class ErrorCode
     public const string TENANT_LIMIT_EXCEEDED = 'tenant.limit_exceeded';
 
     public const string ROLE_NOT_FOUND = 'role.not_found';
+
     public const string ROLE_IN_USE = 'role.in_use';
+
     public const string ROLE_SYSTEM_PROTECTED = 'role.system_protected';
+
     public const string ROLE_OWNER_PROTECTED = 'role.owner_protected';
 }

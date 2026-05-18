@@ -1,15 +1,13 @@
 <?php
 
-use App\Constants\Permission;
-use App\Modules\Access\PermissionService;
+use App\Common\Constants\Permission;
+use App\Modules\Access\Services\PermissionService;
 use App\Modules\Task\Models\Task;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::routes(['middleware' => ['auth:sanctum', \App\Http\Middleware\ResolveTenant::class]]);
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+Broadcast::channel('App.Models.User.{id}', fn($user, $id) => (int) $user->id === (int) $id);
 
 Broadcast::channel('tasks.{taskId}', function ($user, $taskId) {
     $task = Task::find($taskId);

@@ -2,8 +2,10 @@
 
 namespace App\Modules\Task\Requests;
 
+use App\Common\Enumeration\TaskPriority;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateTaskRequest extends FormRequest
 {
@@ -27,6 +29,7 @@ class UpdateTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'status' => 'sometimes|in:todo,doing,completed',
             'due_date' => 'nullable|date',
+            'priority' => ['nullable', Rule::enum(TaskPriority::class)],
         ];
     }
 }

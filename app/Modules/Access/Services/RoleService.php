@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Modules\Access;
+namespace App\Modules\Access\Services;
 
-use App\Constants\ErrorCode;
+use App\Common\Constants\ErrorCode;
 use App\Modules\Access\Models\Permission;
 use App\Modules\Access\Models\Role;
 use App\Modules\Billing\Services\BillingService;
@@ -39,7 +39,6 @@ class RoleService
 
         return $role->load('permissions');
     }
-
 
     public function updateRole(Role $role, Tenant $tenant, User $actor, array $data): Role
     {

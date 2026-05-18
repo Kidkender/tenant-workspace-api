@@ -3,7 +3,7 @@
 namespace App\Modules\User;
 
 use App\Modules\Access\Models\Role;
-use App\Modules\Access\PermissionService;
+use App\Modules\Access\Services\PermissionService;
 use App\Modules\User\Models\User;
 use PhpOption\None;
 

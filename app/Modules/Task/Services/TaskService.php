@@ -2,7 +2,8 @@
 
 namespace App\Modules\Task\Services;
 
-use App\Constants\ErrorCode;
+use App\Common\Constants\ErrorCode;
+use App\Common\Enumeration\TaskPriority;
 use App\Modules\Activity\ActivityLogService;
 use App\Modules\Billing\Services\BillingService;
 use App\Modules\Task\Models\Task;
@@ -14,31 +15,31 @@ use App\Notifications\TaskStatusChanged;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class TaskService
 {
     public function __construct(
         private ActivityLogService $activityLogService,
         private BillingService $billingService,
-    ) {
-    }
+    ) {}
 
     public function getTasks(TaskFilterRequest $request): LengthAwarePaginator
     {
         $limit = $request->input('limit', 10);
 
         return Task::query()
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->assigned_to, fn($q) => $q->where('assigned_to', $request->assigned_to))
-            ->when($request->created_by, fn($q) => $q->where('created_by', $request->created_by))
-            ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%"))
+            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when($request->assigned_to, fn ($q) => $q->where('assigned_to', $request->assigned_to))
+            ->when($request->created_by, fn ($q) => $q->where('created_by', $request->created_by))
+            ->when($request->search, fn ($q) => $q->where('title', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate($limit);
     }
 
     public function getTask(string $tenantId, string $id): Task
     {
-        return Task::where('tenant_id', $tenantId)->findOrFail($id);
+        return Task::where('tenant_id', $tenantId)->with('labels')->findOrFail($id);
     }
 
     public function deleteTask(Task $task): void
@@ -48,11 +49,11 @@ class TaskService
 
     public function createTask(array $data, User $user, Tenant $tenant): Task
     {
-        if (!$tenant->hasUser($user->id)) {
-            throw new \Exception(ErrorCode::TENANT_NOT_MEMBER);
+        if (! $tenant->hasUser($user->id)) {
+            throw new UnauthorizedHttpException(ErrorCode::TENANT_NOT_MEMBER);
         }
 
-        if (!$this->billingService->canCreateTask($tenant->id)) {
+        if (! $this->billingService->canCreateTask($tenant->id)) {
             throw new BadRequestException(ErrorCode::TASK_LIMIT_EXCEEDED);
         }
 
@@ -61,6 +62,7 @@ class TaskService
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
             'status' => 'todo',
+            'priority' => $data['priority'] ?? TaskPriority::Low,
             'created_by' => $user->id,
             'assigned_to' => $data['assigned_to'] ?? null,
             'due_date' => $data['due_date'] ?? null,
@@ -96,7 +98,7 @@ class TaskService
     {
         $user = User::findOrFail($userId);
 
-        if (!$tenant->hasUser($user->id)) {
+        if (! $tenant->hasUser($user->id)) {
             throw new AuthorizationException('User is not a member of this tenant');
         }
 

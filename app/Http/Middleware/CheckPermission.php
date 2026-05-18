@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Constants\ErrorCode;
-use App\Modules\Access\PermissionService;
+use App\Common\Constants\ErrorCode;
+use App\Modules\Access\Services\PermissionService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +12,8 @@ class CheckPermission
 {
     public function __construct(
         private PermissionService $permissionService
-    ) {}
+    ) {
+    }
 
     /**
      * Handle an incoming request.
@@ -23,7 +24,7 @@ class CheckPermission
     {
         $user = $request->user();
         $tenant = app('tenant');
-        if (! $user || ! $tenant) {
+        if (!$user || !$tenant) {
             return response()->json(['error' => ErrorCode::PERMISSION_DENIED], 401);
         }
 

@@ -25,6 +25,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereName($value)
  * @property string|null $tenant_id
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereTenantId($value)
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withoutTrashed()
  * @mixin \Eloquent
  */
 #[Table('roles')]

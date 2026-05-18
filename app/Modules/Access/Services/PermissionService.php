@@ -1,10 +1,12 @@
 <?php
-namespace App\Modules\Access;
+
+namespace App\Modules\Access\Services;
 
 use App\Modules\Access\Models\Role;
 use App\Modules\Tenant\Models\TenantUser;
 use App\Modules\User\Models\User;
 use Illuminate\Support\Facades\Cache;
+
 use function in_array;
 
 class PermissionService
@@ -28,6 +30,7 @@ class PermissionService
                 $roleId = $tenantUser->role_id;
 
                 $permissions = Role::find($roleId)->permissions()->pluck('key')->toArray();
+
                 return $permissions;
 
             }
@@ -45,8 +48,10 @@ class PermissionService
             if (!$tenant) {
                 return false;
             }
+
             return $this->getPermissions($user, $tenantId);
         });
+
         return in_array($permissionKey, $permissions);
     }
 

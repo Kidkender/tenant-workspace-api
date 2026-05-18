@@ -27,6 +27,7 @@ class CreateTaskRequest extends FormRequest
             'description' => 'nullable|string',
             'assigned_to' => 'nullable|uuid',
             'due_date' => 'nullable|date',
+            'priority' => 'nullable|string',
         ];
     }
 }

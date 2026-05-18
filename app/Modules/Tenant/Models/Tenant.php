@@ -35,6 +35,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Tenant whereUpdatedAt($value)
  * @property-read Plan|null $plan
  * @property-read Subscription|null $subscription
+ * @property string $status
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Tenant whereStatus($value)
  * @mixin \Eloquent
  */
 #[Fillable(['name', 'slug', 'plan_id', 'status', 'owner_user_id'])]

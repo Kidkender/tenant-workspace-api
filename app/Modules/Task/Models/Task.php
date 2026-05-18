@@ -3,8 +3,9 @@
 namespace App\Modules\Task\Models;
 
 use App\Modules\File\Models\TaskAttachment;
-use App\Modules\User\Models\User;
+use App\Modules\Labels\Models\Label;
 use App\Modules\Tenant\Models\Tenant;
+use App\Modules\User\Models\User;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -46,10 +47,14 @@ use Illuminate\Support\Carbon;
  * @property-read Tenant $tenant
  * @property-read Collection<int, TaskAttachment> $attachments
  * @property-read int|null $attachments_count
+ * @property string $priority
+ * @property-read Collection<int, Label> $labels
+ * @property-read int|null $labels_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Task wherePriority($value)
  * @mixin \Eloquent
  */
 #[Table('tasks')]
-#[Fillable('tenant_id', 'title', 'description', 'due_date', 'status', 'assigned_to', 'created_by', 'updated_by')]
+#[Fillable('tenant_id', 'title', 'description', 'due_date', 'status', 'priority', 'assigned_to', 'created_by', 'updated_by')]
 #[WithoutIncrementing]
 class Task extends Model
 {
@@ -59,6 +64,7 @@ class Task extends Model
     {
         return [
             'due_date' => 'date',
+            'priority' => 'string',
         ];
     }
 
@@ -94,6 +100,11 @@ class Task extends Model
 
     public function isAssigned(): bool
     {
-        return !is_null($this->assigned_to);
+        return $this->assigned_to !== null;
+    }
+
+    public function labels()
+    {
+        return $this->belongsToMany(Label::class, 'task_labels', 'task_id', 'label_id');
     }
 }

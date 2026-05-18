@@ -7,11 +7,14 @@ use App\Modules\Access\Models\Permission;
 use App\Modules\Access\Models\Role;
 use App\Modules\Access\Requests\CreateRoleRequest;
 use App\Modules\Access\Requests\UpdateRoleRequest;
+use App\Modules\Access\Services\RoleService;
 use Illuminate\Http\JsonResponse;
 
 class RoleController extends Controller
 {
-    public function __construct(private RoleService $roleService) {}
+    public function __construct(private RoleService $roleService)
+    {
+    }
 
     public function index(): JsonResponse
     {
