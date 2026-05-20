@@ -5,7 +5,7 @@ namespace App\Modules\User;
 use App\Modules\Access\Models\Role;
 use App\Modules\Access\Services\PermissionService;
 use App\Modules\User\Models\User;
-use PhpOption\None;
+use App\Modules\User\Requests\UpdateUserRequest;
 
 class UserService
 {
@@ -13,7 +13,7 @@ class UserService
     {
     }
 
-    public function updateMe(User $user, array $data): array
+    public function updateMe(User $user, UpdateUserRequest $data): array
     {
         $user->update(['name' => $data['name']]);
 
@@ -57,4 +57,5 @@ class UserService
         return User::where('email', $email)->first();
 
     }
+
 }

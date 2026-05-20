@@ -1,9 +1,11 @@
 <?php
 
+use App\Common\Constants\Feature;
 use App\Common\Constants\Permission;
 use App\Http\Middleware\ResolveTenant;
 use App\Modules\Access\RoleController;
 use App\Modules\Activity\ActivityLogController;
+use App\Modules\Analytics\Http\Controllers\AnalyticsController;
 use App\Modules\Auth\AuthController;
 use App\Modules\Billing\PlanController;
 use App\Modules\Dashboard\DashboardController;
@@ -24,15 +26,15 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
     $user = User::findOrFail($id);
-    if (! hash_equals(sha1($user->email), $hash)) {
+    if (!hash_equals(sha1($user->email), $hash)) {
         abort(403, 'Invalid verification hash.');
     }
 
-    if (! $user->hasVerifiedEmail()) {
+    if (!$user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
     }
 
-    return redirect(env('FRONTEND_URL').'/email-verified');
+    return redirect(env('FRONTEND_URL') . '/email-verified');
 })->middleware(['signed'])->name('verification.verify');
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -81,57 +83,66 @@ Route::middleware(['auth:sanctum', ResolveTenant::class])->group(function () {
 
     Route::prefix('/tasks')->group(function () {
         Route::get('/', [TaskController::class, 'index'])
-            ->middleware('permission:'.Permission::TASK_VIEW);
+            ->middleware('permission:' . Permission::TASK_VIEW);
 
         Route::get('/{id}', [TaskController::class, 'show'])
-            ->middleware('permission:'.Permission::TASK_VIEW);
+            ->middleware('permission:' . Permission::TASK_VIEW);
 
         Route::post('/', [TaskController::class, 'store'])
-            ->middleware('permission:'.Permission::TASK_CREATE);
+            ->middleware('permission:' . Permission::TASK_CREATE);
 
         Route::put('/{id}', [TaskController::class, 'update'])
-            ->middleware('permission:'.Permission::TASK_UPDATE);
+            ->middleware('permission:' . Permission::TASK_UPDATE);
 
         Route::delete('/{id}', [TaskController::class, 'destroy'])
-            ->middleware('permission:'.Permission::TASK_DELETE);
+            ->middleware('permission:' . Permission::TASK_DELETE);
 
         Route::post('/{id}/assign', [TaskController::class, 'assign'])
-            ->middleware('permission:'.Permission::TASK_UPDATE);
+            ->middleware('permission:' . Permission::TASK_UPDATE);
 
         Route::post('/{id}/labels/sync', [LabelController::class, 'syncTaskLabels'])
-            ->middleware('permission:'.Permission::TASK_UPDATE);
+            ->middleware('permission:' . Permission::TASK_UPDATE);
 
         Route::prefix('{taskId}/comments')->group(function () {
 
             Route::get('/', [TaskCommentController::class, 'index'])
-                ->middleware('permission:'.Permission::TASK_VIEW);
+                ->middleware('permission:' . Permission::TASK_VIEW);
 
             Route::post('/', [TaskCommentController::class, 'store'])
-                ->middleware('permission:'.Permission::COMMENT_CREATE);
+                ->middleware('permission:' . Permission::COMMENT_CREATE);
 
             Route::put('/{commentId}', [TaskCommentController::class, 'update']);
 
             Route::delete('/{commentId}', [TaskCommentController::class, 'destroy'])
-                ->middleware('permission:'.Permission::COMMENT_DELETE);
+                ->middleware('permission:' . Permission::COMMENT_DELETE);
 
             Route::post('/{commentId}/attachments', [TaskAttachmentController::class, 'storeComment'])
-                ->middleware('permission:'.Permission::ATTACHMENT_CREATE);
+                ->middleware('permission:' . Permission::ATTACHMENT_CREATE);
         });
 
         Route::prefix('{taskId}/attachments')->group(function () {
 
             Route::get('/', [TaskAttachmentController::class, 'index'])
-                ->middleware('permission:'.Permission::TASK_VIEW);
+                ->middleware('permission:' . Permission::TASK_VIEW);
 
             Route::post('/', [TaskAttachmentController::class, 'store'])
-                ->middleware('permission:'.Permission::ATTACHMENT_CREATE);
+                ->middleware('permission:' . Permission::ATTACHMENT_CREATE);
 
             Route::get('/{attachmentId}/download', [TaskAttachmentController::class, 'download'])
-                ->middleware('permission:'.Permission::TASK_VIEW);
+                ->middleware('permission:' . Permission::TASK_VIEW);
 
             Route::delete('/{attachmentId}', [TaskAttachmentController::class, 'destroy'])
-                ->middleware('permission:'.Permission::ATTACHMENT_DELETE);
+                ->middleware('permission:' . Permission::ATTACHMENT_DELETE);
         });
     });
 
+    Route::prefix('analytics')
+        ->middleware('feature:' . Feature::ANALYTICS)
+        ->group(function () {
+            Route::get('/completion-rate', [AnalyticsController::class, 'completionRate']);
+            Route::get('/tasks-per-user', [AnalyticsController::class, 'tasksPerUser']);
+            Route::get('/overdue-rate', [AnalyticsController::class, 'overdueRate']);
+            Route::get('/priority-distribution', [AnalyticsController::class, 'priorityDistribution']);
+            Route::get('/trend', [AnalyticsController::class, 'trend']);
+        });
 });

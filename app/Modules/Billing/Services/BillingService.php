@@ -2,7 +2,7 @@
 
 namespace App\Modules\Billing\Services;
 
-use App\Constants\Feature;
+use App\Common\Constants\Feature;
 use App\Modules\Task\Models\Task;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\Tenant\Models\TenantUser;
@@ -43,11 +43,17 @@ class BillingService
     {
         $allowedLimit = $this->planService->getMaxLimitTenantByOwner($userId);
         $ownedCount = Tenant::where('owner_user_id', $userId)->count();
+
         return $ownedCount < $allowedLimit;
     }
 
     public function canCreateRole(string $tenantId): bool
     {
         return (bool) $this->planService->getFeatureValueByTenant(Feature::CUSTOM_ROLES, $tenantId);
+    }
+
+    public function hasFeature(string $tenantId, string $feature): bool
+    {
+        return $this->planService->canUseFeature($feature, $tenantId);
     }
 }

@@ -26,7 +26,7 @@ class TaskAssigned extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -37,7 +37,7 @@ class TaskAssigned extends Notification
         return (new MailMessage)
             ->subject('Task Assigned')
             ->line('You have a new task')
-            ->action('View Task', url('/tasks/'.$this->task->id));
+            ->action('View Task', url('/tasks/' . $this->task->id));
     }
 
     /**
@@ -51,7 +51,7 @@ class TaskAssigned extends Notification
             'task_id' => $this->task->id,
             'task_title' => $this->task->title,
             'tenant_id' => $this->task->tenant_id,
-            'message' => 'You were assigned to task: '.$this->task->title,
+            'message' => 'You were assigned to task: ' . $this->task->title,
         ];
     }
 }

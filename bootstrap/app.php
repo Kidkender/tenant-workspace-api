@@ -1,20 +1,21 @@
 <?php
 
-use App\Constants\ErrorCode;
+use App\Common\Constants\ErrorCode;
 use App\Http\Middleware\CheckPermission;
-
+use App\Http\Middleware\RequireFeature;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -29,7 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(HandleCors::class);
         $middleware->preventRequestForgery(except: ['broadcasting/auth']);
         $middleware->alias([
-            'permission' => CheckPermission::class
+            'permission' => CheckPermission::class,
+            'feature' => RequireFeature::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -41,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ], 400));
 
         $exceptions->render(fn(AuthenticationException $e) => response()->json([
-            'error' => ErrorCode::AUTH_UNAUTHORIZED
+            'error' => ErrorCode::AUTH_UNAUTHORIZED,
         ], 401));
 
         $exceptions->render(fn(AccessDeniedHttpException $e) => response()->json([
@@ -65,18 +67,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'errors' => $e->errors(),
         ], 422));
 
-
         $exceptions->render(fn(ThrottleRequestsException $e) => response()->json([
             'error' => ErrorCode::TOO_MANY_REQUESTS,
         ], 429));
 
-
-        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+        $exceptions->render(function (Throwable $e, Request $request) {
             if (!$request->is('api/*')) {
                 return null;
             }
 
-            \Log::error('Server error: ', [
+            Log::error('Server error: ', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),

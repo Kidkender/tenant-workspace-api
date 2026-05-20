@@ -57,4 +57,6 @@ class ErrorCode
     public const string ROLE_SYSTEM_PROTECTED = 'role.system_protected';
 
     public const string ROLE_OWNER_PROTECTED = 'role.owner_protected';
+
+    public const string FEATURE_NOT_AVAILABLE = 'feature.not_available';
 }
