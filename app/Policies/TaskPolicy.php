@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Constants\Permission;
-use App\Modules\Access\PermissionService;
+use App\Common\Constants\Permission;
+use App\Modules\Access\Services\PermissionService;
 use App\Modules\Task\Models\Task;
 use App\Modules\Tenant\Models\Tenant;
 use App\Modules\User\Models\User;
@@ -44,7 +44,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        if (! $this->permissionService->hasPermission($user, Permission::TASK_UPDATE, $task->tenant_id)) {
+        if (!$this->permissionService->hasPermission($user, Permission::TASK_UPDATE, $task->tenant_id)) {
             return false;
         }
 
@@ -56,11 +56,11 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        if (! $this->permissionService->hasPermission($user, Permission::TASK_DELETE, $task->tenant_id)) {
+        if (!$this->permissionService->hasPermission($user, Permission::TASK_DELETE, $task->tenant_id)) {
             return false;
         }
 
-        if (! $this->permissionService->hasPermission($user, Permission::TASK_DELETE_ANY, $task->tenant_id)) {
+        if (!$this->permissionService->hasPermission($user, Permission::TASK_DELETE_ANY, $task->tenant_id)) {
             return true;
         }
 
